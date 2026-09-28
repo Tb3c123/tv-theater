@@ -118,6 +118,7 @@ fun PlayerScreen(
         } else if (uiState.embedUrl.isNotBlank()) {
             FallbackWebViewPlayer(
                 embedUrl = uiState.embedUrl,
+                isPlaying = uiState.isPlaying,
                 onProgressUpdate = { pos, dur ->
                     viewModel.updateProgress(pos, dur)
                 },

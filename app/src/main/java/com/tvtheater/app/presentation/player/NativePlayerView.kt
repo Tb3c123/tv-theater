@@ -102,6 +102,8 @@ fun NativePlayerView(
             PlayerView(ctx).apply {
                 player = exoPlayer
                 useController = false // We use our own customized 10-foot TV OSD
+                useArtwork = false
+                defaultArtwork = null
                 layoutParams = FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
