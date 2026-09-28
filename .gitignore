@@ -1,16 +1,17 @@
-
 # Agent-Pack (Local AI Assistant & SDLC tools)
 .agent/
 .agent
 .agent/.env.agent
 
-# Android & Gradle
-*.iml
-.gradle
+# Android & Gradle Build Artifacts
+build/
+**/build/
+.gradle/
+**/.gradle/
 /local.properties
 /.idea/
 .DS_Store
-/build
+*.iml
 /captures
 .externalNativeBuild
 .cxx

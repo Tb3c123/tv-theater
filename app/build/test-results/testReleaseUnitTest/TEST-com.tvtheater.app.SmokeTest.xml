@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.tvtheater.app.SmokeTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-28T03:25:54" hostname="Hieu-Nguyen.local" time="0.03">
-  <properties/>
-  <testcase name="test runner environment is operational" classname="com.tvtheater.app.SmokeTest" time="0.001"/>
-  <testcase name="verify random discovery logic baseline" classname="com.tvtheater.app.SmokeTest" time="0.029"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
