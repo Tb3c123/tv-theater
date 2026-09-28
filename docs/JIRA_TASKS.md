@@ -1,0 +1,58 @@
+# Danh Mục Task Jira & Tiến Độ Dự Án (TV Theater)
+
+> **Jira Cloud Project**: [Home Lab (SCRUM)](https://khongdung165.atlassian.net/jira/software/projects/SCRUM/boards)  
+> **Cập nhật lần cuối**: 11:17:26 28/9/2026  
+> **Tài khoản**: `khongdung165@gmail.com`
+
+---
+
+## 📊 Bảng Theo Dõi Task Chi Tiết
+
+| Mã Task | Loại | Tên Task & Chi Tiết | Trạng Thái | Link Jira Trực Tiếp |
+| :--- | :--- | :--- | :---: | :--- |
+| **[SCRUM-5](https://khongdung165.atlassian.net/browse/SCRUM-5)** | 🏷️ Epic | **[EPIC 1] Core Data Models & Network Layer (NguonC API)**<br>_Xây dựng tầng Data DTO, Retrofit Service và Repository kết nối API phim.nguonc.com_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-5) |
+| **[SCRUM-6](https://khongdung165.atlassian.net/browse/SCRUM-6)** | 🏷️ Epic | **[EPIC 2] Local Storage & Room Database (History & Watchlist)**<br>_Xây dựng Room Database lưu trữ lịch sử xem tiếp tục và danh sách yêu thích_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-6) |
+| **[SCRUM-7](https://khongdung165.atlassian.net/browse/SCRUM-7)** | 🏷️ Epic | **[EPIC 3] Domain Layer & Random Discovery Engine**<br>_Xây dựng Use Cases và thuật toán Shuffle ngẫu nhiên làm mới chủ đề đa dạng trên Android TV_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-7) |
+| **[SCRUM-8](https://khongdung165.atlassian.net/browse/SCRUM-8)** | 🏷️ Epic | **[EPIC 4] TV 10-foot UI Presentation (Compose for TV)**<br>_Xây dựng giao diện TV 10-foot với Compose for TV, bảng màu Soft Blue, D-Pad focus và bàn phím ảo_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-8) |
+| **[SCRUM-9](https://khongdung165.atlassian.net/browse/SCRUM-9)** | 🏷️ Epic | **[EPIC 5] Hybrid Video Player Engine (Media3 ExoPlayer & TV WebView)**<br>_Xây dựng trình phát video lai Native ExoPlayer HLS và Fallback WebView với D-Pad OSD timeline_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-9) |
+| **[SCRUM-10](https://khongdung165.atlassian.net/browse/SCRUM-10)** | 🏷️ Epic | **[EPIC 6-7] Security Audit & DevOps CI/CD**<br>_Kiểm toán bảo mật OWASP và thiết lập Docker, CI/CD pipeline_ | 🟡 **To Do** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-10) |
+| **[SCRUM-11](https://khongdung165.atlassian.net/browse/SCRUM-11)** | 📌 Task | **Phase 1: Discovery & PRD (TV Theater Requirements)**<br>_Thu thập yêu cầu, định hình Persona gia đình, thiết kế tính năng không lọc an toàn, chốt PRD.md (Quality Gate 1)_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-11) |
+| **[SCRUM-12](https://khongdung165.atlassian.net/browse/SCRUM-12)** | 📌 Task | **Phase 2: System Architecture & DB/API Contracts**<br>_Thiết kế Clean Architecture, ERD DATABASE_SCHEMA.md, và hợp đồng OpenAPI 3.0 (Quality Gate 2)_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-12) |
+| **[SCRUM-13](https://khongdung165.atlassian.net/browse/SCRUM-13)** | 📌 Task | **Phase 3: Environment Setup & Packages**<br>_Cấu hình OpenJDK 17, Android SDK, Compose for TV, Media3, Retrofit, Room và chạy smoke test_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-13) |
+| **[SCRUM-14](https://khongdung165.atlassian.net/browse/SCRUM-14)** | 📌 Task | **Phase 4: Task Breakdown & Backlog Management**<br>_Phân rã backlog chi tiết vào tasks.md và đồng bộ hóa với Jira board_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-14) |
+| **[SCRUM-15](https://khongdung165.atlassian.net/browse/SCRUM-15)** | 📌 Task | **Task 1.1: Tạo DTOs cho NguonC API (FilmListResponse, FilmDetailResponse, EpisodeDto)**<br>_Data Transfer Objects parse JSON cấu trúc phim, thể loại, danh sách tập từ NguonC API_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-15) |
+| **[SCRUM-16](https://khongdung165.atlassian.net/browse/SCRUM-16)** | 📌 Task | **Task 1.2: Viết Unit Test cho DTO JSON parsing (NguonCApiDtoTest)**<br>_Unit test kiểm tra tính toàn vẹn khi deserialize response JSON mẫu từ NguonC_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-16) |
+| **[SCRUM-17](https://khongdung165.atlassian.net/browse/SCRUM-17)** | 📌 Task | **Task 1.3: Tạo Retrofit Service NguonCApiService và MovieRepository**<br>_Interface Retrofit định nghĩa các endpoint và MovieRepositoryImpl xử lý mapping sang domain model_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-17) |
+| **[SCRUM-18](https://khongdung165.atlassian.net/browse/SCRUM-18)** | 📌 Task | **Task 1.4: Viết Unit Test cho MovieRepository với Mock response**<br>_Unit test với Mockk giả lập response API kiểm tra luồng trả về Result.success / Result.failure_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-18) |
+| **[SCRUM-19](https://khongdung165.atlassian.net/browse/SCRUM-19)** | 📌 Task | **Task 2.1: Tạo Room Entities: WatchHistoryEntity, WatchlistEntity**<br>_Định nghĩa bảng cơ sở dữ liệu Room lưu lịch sử xem phim và danh sách xem sau_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-19) |
+| **[SCRUM-20](https://khongdung165.atlassian.net/browse/SCRUM-20)** | 📌 Task | **Task 2.2: Tạo DAOs: WatchHistoryDao, WatchlistDao với Reactive Flow**<br>_Định nghĩa các hàm truy vấn Flow<List<Entity>> tự động cập nhật UI khi dữ liệu thay đổi_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-20) |
+| **[SCRUM-21](https://khongdung165.atlassian.net/browse/SCRUM-21)** | 📌 Task | **Task 2.3: Viết Unit Test cho Room DAOs và HistoryRepository**<br>_Unit test kiểm tra thêm, xóa, cập nhật vị trí phát (resume position ms)_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-21) |
+| **[SCRUM-22](https://khongdung165.atlassian.net/browse/SCRUM-22)** | 📌 Task | **Task 3.1: Xây dựng GetRandomCatalogUseCase (thuật toán Shuffle ngẫu nhiên)**<br>_Thuật toán ngẫu nhiên lấy ngẫu nhiên 3 thể loại và Hero Banner mỗi lần tải để đa dạng chủ đề_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-22) |
+| **[SCRUM-23](https://khongdung165.atlassian.net/browse/SCRUM-23)** | 📌 Task | **Task 3.2: Viết Unit Test kiểm tra tính ngẫu nhiên của GetRandomCatalogUseCaseTest**<br>_Unit test xác minh danh mục hiển thị thay đổi và phân bố hợp lý_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-23) |
+| **[SCRUM-24](https://khongdung165.atlassian.net/browse/SCRUM-24)** | 📌 Task | **Task 3.3: Xây dựng ManageHistoryUseCase (lưu vị trí xem dở, tự động đánh dấu tập)**<br>_Domain use case phục vụ lưu tiến độ phát và danh sách tiếp tục xem trên trang chủ_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-24) |
+| **[SCRUM-25](https://khongdung165.atlassian.net/browse/SCRUM-25)** | 📌 Task | **Task 4.1: Xây dựng Theme Soft Blue (Color.kt, Theme.kt, Focus Border Tokens)**<br>_Thiết kế bảng màu Soft Blue (#38BDF8, #7DD3FC) trên nền Cinema Dark Navy (#0B1120) cho TV_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-25) |
+| **[SCRUM-26](https://khongdung165.atlassian.net/browse/SCRUM-26)** | 📌 Task | **Task 4.2: Xây dựng Component HeroBanner (Backdrop lớn, Tiêu đề, Badge chất lượng, Nút D-Pad)**<br>_Banner nổi bật đầu trang chủ với hình ảnh sắc nét, dải gradient mượt và nút xem nhanh_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-26) |
+| **[SCRUM-27](https://khongdung165.atlassian.net/browse/SCRUM-27)** | 📌 Task | **Task 4.3: Xây dựng Component MovieCard & MovieRow (TvLazyRow Focus Scale 1.08x)**<br>_Thẻ phim và hàng phim ngang tối ưu cho D-Pad điều khiển từ xa, viền sáng Ice Blue khi focus_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-27) |
+| **[SCRUM-28](https://khongdung165.atlassian.net/browse/SCRUM-28)** | 📌 Task | **Task 4.4: Xây dựng HomeScreen tích hợp HomeViewModel và StateFlow**<br>_Màn hình chính hiển thị Hero Banner, hàng Tiếp Tục Xem và các danh mục phim động_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-28) |
+| **[SCRUM-29](https://khongdung165.atlassian.net/browse/SCRUM-29)** | 📌 Task | **Task 4.5: Xây dựng DetailScreen (Metadata, Diễn viên, Bộ chọn Server & Lưới tập phim)**<br>_Màn hình chi tiết phim hiển thị thông tin, danh sách diễn viên, chọn nguồn phát và danh sách tập_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-29) |
+| **[SCRUM-30](https://khongdung165.atlassian.net/browse/SCRUM-30)** | 📌 Task | **Task 4.6: Xây dựng SearchScreen với Bàn phím ảo On-Screen TV Keyboard**<br>_Màn hình tìm kiếm với bàn phím ảo TV điều hướng bằng Remote D-Pad và kết quả tìm kiếm tức thì_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-30) |
+| **[SCRUM-31](https://khongdung165.atlassian.net/browse/SCRUM-31)** | 📌 Task | **Task 5.1: Xây dựng HLS Stream Extractor (ExtractStreamUrlUseCase)**<br>_Trích xuất luồng trực tiếp .m3u8 từ embed StreamCDN hoặc chuyển tiếp thông minh_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-31) |
+| **[SCRUM-32](https://khongdung165.atlassian.net/browse/SCRUM-32)** | 📌 Task | **Task 5.2: Xây dựng NativePlayer với AndroidX Media3 ExoPlayer, D-Pad Remote controls**<br>_Trình phát video gốc với tua 10s (Left/Right), Play/Pause (Center), thanh thời gian OSD_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-32) |
+| **[SCRUM-33](https://khongdung165.atlassian.net/browse/SCRUM-33)** | 📌 Task | **Task 5.3: Xây dựng FallbackWebViewPlayer với D-Pad Key Event JavaScript bridge**<br>_Trình phát WebView dự phòng với CSS tràn màn hình và cầu nối phím điều khiển từ xa_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-33) |
+| **[SCRUM-34](https://khongdung165.atlassian.net/browse/SCRUM-34)** | 📌 Task | **Task 5.4: Tự động lưu tiến độ xem dở mỗi 5s vào Room DB và chuyển tập kế tiếp**<br>_Cơ chế throttle lưu vị trí xem mỗi 5 giây vào Room để tự động tiếp tục khi xem lại_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-34) |
+| **[SCRUM-35](https://khongdung165.atlassian.net/browse/SCRUM-35)** | 📌 Task | **Task 5.5: Viết Unit Test cho PlayerViewModel & Playback Controller**<br>_Unit test kiểm tra chuyển đổi chế độ phát, lưu vị trí và trạng thái OSD_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-35) |
+| **[SCRUM-36](https://khongdung165.atlassian.net/browse/SCRUM-36)** | 📌 Task | **Task 5.6: Chạy toàn bộ test suite kiểm tra 100% pass (Quality Gate 3)**<br>_26/26 unit tests vượt qua thành công và build hoàn tất APK TV Theater_ | 🟢 **Done** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-36) |
+| **[SCRUM-37](https://khongdung165.atlassian.net/browse/SCRUM-37)** | 📌 Task | **Phase 6: Security & Quality Audit**<br>_Quét lỗ hổng OWASP Top 10, kiểm tra rò rỉ mã bí mật và an toàn dữ liệu_ | 🟡 **To Do** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-37) |
+| **[SCRUM-38](https://khongdung165.atlassian.net/browse/SCRUM-38)** | 📌 Task | **Phase 7: DevOps, Containerization & CI/CD**<br>_Tạo Dockerfile, docker-compose và quy trình GitHub Actions tự động build test APK_ | 🟡 **To Do** | [Xem trên Jira ↗](https://khongdung165.atlassian.net/browse/SCRUM-38) |
+
+---
+
+## 🎯 Tổng Kết Tiến Độ
+
+- **Tổng số task đã đồng bộ**: 34
+- **Hoàn thành**: 31
+- **Chờ thực hiện**: 3
+- **Tỷ lệ hoàn thành**: 91%
+
+---
+*Tài liệu được tự động tạo và cập nhật bởi Agent-Pack SDLC System.*

@@ -1,0 +1,58 @@
+package com.tvtheater.app.domain.usecase
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.util.regex.Pattern
+
+sealed interface StreamResult {
+    data class DirectHls(val streamUrl: String) : StreamResult
+    data class FallbackEmbed(val embedUrl: String) : StreamResult
+}
+
+class ExtractStreamUrlUseCase(
+    private val httpClient: OkHttpClient = OkHttpClient()
+) {
+    private val m3u8Regex = Pattern.compile("""https?://[^"'\s<>\\]+\.m3u8[^"'\s<>\\]*""")
+
+    suspend operator fun invoke(embedUrl: String): StreamResult = withContext(Dispatchers.IO) {
+        val trimmed = embedUrl.trim()
+
+        // 1. Direct stream check
+        if (trimmed.endsWith(".m3u8", ignoreCase = true) || trimmed.endsWith(".mp4", ignoreCase = true)) {
+            return@withContext StreamResult.DirectHls(trimmed)
+        }
+
+        // 2. Fetch HTML page with Android TV User Agent & Referer
+        try {
+            val request = Request.Builder()
+                .url(trimmed)
+                .addHeader("User-Agent", "Mozilla/5.0 (Linux; Android 12; BRAVIA 4K Build/BRAVIA_ATV4_EU) AppleWebKit/537.36 Chrome/100.0.0.0 Safari/537.36")
+                .addHeader("Referer", "https://phim.nguonc.com/")
+                .build()
+
+            val response = httpClient.newCall(request).execute()
+            if (response.isSuccessful) {
+                val body = response.body?.string().orEmpty()
+                val directM3u8 = extractM3u8FromHtml(body)
+                if (directM3u8 != null) {
+                    return@withContext StreamResult.DirectHls(directM3u8)
+                }
+            }
+        } catch (_: Exception) {
+            // In case of network timeout, firewall interception, or bad URL, gracefully fallback
+        }
+
+        // 3. Fallback to WebView Embed
+        StreamResult.FallbackEmbed(trimmed)
+    }
+
+    fun extractM3u8FromHtml(html: String): String? {
+        val matcher = m3u8Regex.matcher(html)
+        if (matcher.find()) {
+            return matcher.group()
+        }
+        return null
+    }
+}
