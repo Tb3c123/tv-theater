@@ -17,3 +17,5 @@ build/
 .cxx
 *.apk
 *.aab
+dist/
+/dist/

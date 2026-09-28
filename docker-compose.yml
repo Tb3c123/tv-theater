@@ -1,0 +1,10 @@
+services:
+  tv-theater-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: exporter
+    container_name: tv-theater-build
+    volumes:
+      - ./dist:/output
+    command: ["cp", "/dist/tv-theater-debug.apk", "/output/tv-theater-debug.apk"]
