@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent_blue">#0284C7</color>
+    <color name="background_navy">#0B1120</color>
+    <color name="primary_ice_blue">#38BDF8</color>
+    <color name="primary_sky_blue">#7DD3FC</color>
+    <color name="surface_slate">#0F172A</color>
+    <color name="text_slate_gray">#94A3B8</color>
+    <color name="text_soft_white">#F8FAFC</color>
+    <string name="app_name">TV Theater</string>
+    <string name="continue_watching">Tiếp Tục Xem</string>
+    <string name="episode_selector">Danh Sách Tập</string>
+    <string name="featured_movies">Phim Lẻ Đặc Sắc</string>
+    <string name="hero_details">Chi Tiết</string>
+    <string name="hero_watch_now">Xem Ngay</string>
+    <string name="latest_updates">Phim Mới Cập Nhật</string>
+    <string name="random_discovery">Hôm Nay Xem Gì? (Gợi Ý Ngẫu Nhiên)</string>
+    <string name="search_hint">Nhập tên phim cần tìm...</string>
+    <string name="trending_series">Phim Bộ Thịnh Hành</string>
+    <string name="watchlist_title">Phim Yêu Thích Của Gia Đình</string>
+    <style name="Theme.TVTheater" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/background_navy</item>
+        <item name="android:colorBackground">@color/background_navy</item>
+        <item name="android:colorPrimary">@color/primary_ice_blue</item>
+    </style>
+</resources>

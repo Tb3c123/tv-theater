@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">TV Theater</string>
+    <string name="hero_watch_now">Xem Ngay</string>
+    <string name="hero_details">Chi Tiết</string>
+    <string name="continue_watching">Tiếp Tục Xem</string>
+    <string name="latest_updates">Phim Mới Cập Nhật</string>
+    <string name="trending_series">Phim Bộ Thịnh Hành</string>
+    <string name="featured_movies">Phim Lẻ Đặc Sắc</string>
+    <string name="random_discovery">Hôm Nay Xem Gì? (Gợi Ý Ngẫu Nhiên)</string>
+    <string name="search_hint">Nhập tên phim cần tìm...</string>
+    <string name="watchlist_title">Phim Yêu Thích Của Gia Đình</string>
+    <string name="episode_selector">Danh Sách Tập</string>
+</resources>

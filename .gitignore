@@ -1,0 +1,18 @@
+
+# Agent-Pack (Local AI Assistant & SDLC tools)
+.agent/
+.agent
+.agent/.env.agent
+
+# Android & Gradle
+*.iml
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.TVTheater" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/background_navy</item>
+        <item name="android:colorBackground">@color/background_navy</item>
+        <item name="android:colorPrimary">@color/primary_ice_blue</item>
+    </style>
+</resources>

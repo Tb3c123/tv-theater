@@ -1,0 +1,22 @@
+R_DEF: Internal format may change without notice
+local
+color accent_blue
+color background_navy
+color primary_ice_blue
+color primary_sky_blue
+color surface_slate
+color text_slate_gray
+color text_soft_white
+drawable tv_banner
+string app_name
+string continue_watching
+string episode_selector
+string featured_movies
+string hero_details
+string hero_watch_now
+string latest_updates
+string random_discovery
+string search_hint
+string trending_series
+string watchlist_title
+style Theme.TVTheater
