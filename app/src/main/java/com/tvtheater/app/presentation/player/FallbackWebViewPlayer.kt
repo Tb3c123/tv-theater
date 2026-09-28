@@ -2,10 +2,10 @@ package com.tvtheater.app.presentation.player
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -41,7 +41,9 @@ fun FallbackWebViewPlayer(
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 mediaPlaybackRequiresUserGesture = false
-                allowFileAccess = true
+                // Security Hardening: Disable arbitrary local file/content access
+                allowFileAccess = false
+                allowContentAccess = false
                 databaseEnabled = true
                 cacheMode = WebSettings.LOAD_DEFAULT
                 useWideViewPort = true
@@ -57,8 +59,14 @@ fun FallbackWebViewPlayer(
 
             webViewClient = object : WebViewClient() {
                 override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                    // Stay within the player embed domain
                     return false
+                }
+
+                override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                    super.onReceivedError(view, request, error)
+                    if (request?.isForMainFrame == true) {
+                        onError("Không thể tải nguồn phát trực tuyến")
+                    }
                 }
 
                 override fun onPageFinished(view: WebView?, url: String?) {

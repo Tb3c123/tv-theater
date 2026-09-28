@@ -1,7 +1,7 @@
 # Danh Mục Task Jira & Tiến Độ Dự Án (TV Theater)
 
 > **Jira Cloud Project**: [Home Lab (SCRUM)](https://khongdung165.atlassian.net/jira/software/projects/SCRUM/boards)  
-> **Cập nhật lần cuối**: 11:17:26 28/9/2026  
+> **Cập nhật lần cuối**: 11:54:11 28/9/2026  
 > **Tài khoản**: `khongdung165@gmail.com`
 
 ---
