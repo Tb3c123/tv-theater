@@ -20,8 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import kotlinx.coroutines.delay
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -61,9 +65,19 @@ fun DetailScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val playFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(movieSlug) {
         viewModel.loadMovie(movieSlug)
+    }
+
+    LaunchedEffect(uiState) {
+        if (uiState is DetailUiState.Success) {
+            delay(150)
+            try {
+                playFocusRequester.requestFocus()
+            } catch (_: Exception) {}
+        }
     }
 
     Box(
@@ -267,6 +281,7 @@ fun DetailScreen(
                                                 defaultEpisode.embedUrl
                                             )
                                         },
+                                        modifier = Modifier.focusRequester(playFocusRequester),
                                         scale = ButtonDefaults.scale(focusedScale = 1.05f),
                                         colors = ButtonDefaults.colors(
                                             containerColor = IceBluePrimary,

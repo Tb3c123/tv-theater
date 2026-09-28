@@ -14,7 +14,7 @@ sealed interface StreamResult {
 class ExtractStreamUrlUseCase(
     private val httpClient: OkHttpClient = OkHttpClient()
 ) {
-    private val m3u8Regex = Pattern.compile("""https?://[^"'\s<>\\]+\.m3u8[^"'\s<>\\]*""")
+    private val m3u8Regex = Pattern.compile("""https?://[^"'\s<>\\]+\.(m3u8|mp4)[^"'\s<>\\]*""")
 
     suspend operator fun invoke(embedUrl: String): StreamResult = withContext(Dispatchers.IO) {
         val trimmed = embedUrl.trim()
@@ -24,20 +24,20 @@ class ExtractStreamUrlUseCase(
             return@withContext StreamResult.DirectHls(trimmed)
         }
 
-        // 2. Fetch HTML page with Android TV User Agent & Referer
+        // 2. Fetch HTML page with User Agent & Referer
         try {
             val request = Request.Builder()
                 .url(trimmed)
-                .addHeader("User-Agent", "Mozilla/5.0 (Linux; Android 12; BRAVIA 4K Build/BRAVIA_ATV4_EU) AppleWebKit/537.36 Chrome/100.0.0.0 Safari/537.36")
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
                 .addHeader("Referer", "https://phim.nguonc.com/")
                 .build()
 
             val response = httpClient.newCall(request).execute()
             if (response.isSuccessful) {
                 val body = response.body?.string().orEmpty()
-                val directM3u8 = extractM3u8FromHtml(body)
-                if (directM3u8 != null) {
-                    return@withContext StreamResult.DirectHls(directM3u8)
+                val directStream = extractM3u8FromHtml(body)
+                if (directStream != null) {
+                    return@withContext StreamResult.DirectHls(directStream)
                 }
             }
         } catch (_: Exception) {
@@ -49,7 +49,8 @@ class ExtractStreamUrlUseCase(
     }
 
     fun extractM3u8FromHtml(html: String): String? {
-        val matcher = m3u8Regex.matcher(html)
+        val normalized = html.replace("\\/", "/")
+        val matcher = m3u8Regex.matcher(normalized)
         if (matcher.find()) {
             return matcher.group()
         }

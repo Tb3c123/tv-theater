@@ -89,6 +89,16 @@ class PlayerViewModel(
         }
     }
 
+    fun onDirectStreamFound(url: String) {
+        if (_uiState.value.streamUrl != url) {
+            _uiState.value = _uiState.value.copy(
+                streamUrl = url,
+                playerMode = PlayerMode.NATIVE_EXOPLAYER,
+                isBuffering = false
+            )
+        }
+    }
+
     fun togglePlayPause() {
         _uiState.value = _uiState.value.copy(isPlaying = !_uiState.value.isPlaying)
         showOsdTemporarily()

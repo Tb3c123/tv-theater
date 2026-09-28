@@ -121,6 +121,9 @@ fun PlayerScreen(
                 onProgressUpdate = { pos, dur ->
                     viewModel.updateProgress(pos, dur)
                 },
+                onStreamFound = { streamUrl ->
+                    viewModel.onDirectStreamFound(streamUrl)
+                },
                 onError = { error ->
                     viewModel.onPlayerError(error)
                 },

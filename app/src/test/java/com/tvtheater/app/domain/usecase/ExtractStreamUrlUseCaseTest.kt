@@ -55,6 +55,17 @@ class ExtractStreamUrlUseCaseTest {
     }
 
     @Test
+    fun htmlWithEscapedSlashesExtractsCorrectM3u8() {
+        val htmlContent = """
+            <script>
+                var player = { "file": "https:\/\/sv2.streamcdn.com\/hls\/stream.m3u8?token=abc" };
+            </script>
+        """.trimIndent()
+        val extracted = useCase.extractM3u8FromHtml(htmlContent)
+        assertEquals("https://sv2.streamcdn.com/hls/stream.m3u8?token=abc", extracted)
+    }
+
+    @Test
     fun htmlWithoutM3u8ReturnsNull() {
         val htmlContent = "<html><body>No stream available</body></html>"
         val extracted = useCase.extractM3u8FromHtml(htmlContent)

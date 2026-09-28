@@ -135,4 +135,30 @@ class PlayerViewModelTest {
             )
         }
     }
+
+    @Test
+    fun onDirectStreamFoundSwitchesToNativePlayerMode() = runTest {
+        val embedUrl = "https://embed.streamc.xyz/embed.php?hash=456"
+        coEvery { extractStreamUrlUseCase(embedUrl) } returns StreamResult.FallbackEmbed(embedUrl)
+
+        viewModel.initPlayer(
+            movieSlug = "phim-test",
+            movieName = "Phim Test",
+            posterUrl = "https://example.com/poster.jpg",
+            episodeSlug = "tap-1",
+            episodeName = "Tập 1",
+            embedUrl = embedUrl,
+            initialPositionMs = 0L
+        )
+        advanceUntilIdle()
+
+        assertEquals(PlayerMode.WEBVIEW_FALLBACK, viewModel.uiState.value.playerMode)
+
+        val interceptedHlsUrl = "https://cdn.streamc.xyz/hls/master.m3u8"
+        viewModel.onDirectStreamFound(interceptedHlsUrl)
+
+        assertEquals(PlayerMode.NATIVE_EXOPLAYER, viewModel.uiState.value.playerMode)
+        assertEquals(interceptedHlsUrl, viewModel.uiState.value.streamUrl)
+        assertFalse(viewModel.uiState.value.isBuffering)
+    }
 }

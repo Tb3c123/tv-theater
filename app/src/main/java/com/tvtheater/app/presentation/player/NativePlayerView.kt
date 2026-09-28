@@ -16,7 +16,8 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.common.MimeTypes
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -33,22 +34,28 @@ fun NativePlayerView(
 ) {
     val context = LocalContext.current
 
-    val exoPlayer = remember {
+    val exoPlayer = remember(streamUrl) {
         val httpDataSourceFactory = DefaultHttpDataSource.Factory()
             .setAllowCrossProtocolRedirects(true)
-            .setUserAgent("Mozilla/5.0 (Linux; Android 12; BRAVIA 4K Build/BRAVIA_ATV4_EU) AppleWebKit/537.36")
+            .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
             .setDefaultRequestProperties(mapOf("Referer" to "https://phim.nguonc.com/"))
 
-        val hlsSourceFactory = HlsMediaSource.Factory(httpDataSourceFactory)
-            .setAllowChunklessPreparation(true)
+        val mediaSourceFactory = DefaultMediaSourceFactory(context)
+            .setDataSourceFactory(httpDataSourceFactory)
+
+        val mediaItemBuilder = MediaItem.Builder().setUri(streamUrl)
+        if (streamUrl.contains(".m3u8", ignoreCase = true)) {
+            mediaItemBuilder.setMimeType(MimeTypes.APPLICATION_M3U8)
+        } else if (streamUrl.contains(".mp4", ignoreCase = true)) {
+            mediaItemBuilder.setMimeType(MimeTypes.VIDEO_MP4)
+        }
 
         ExoPlayer.Builder(context)
-            .setMediaSourceFactory(hlsSourceFactory)
+            .setMediaSourceFactory(mediaSourceFactory)
             .setSeekForwardIncrementMs(10_000L)
             .setSeekBackIncrementMs(10_000L)
             .build().apply {
-                val mediaItem = MediaItem.fromUri(streamUrl)
-                setMediaItem(mediaItem)
+                setMediaItem(mediaItemBuilder.build())
                 if (initialPositionMs > 0) {
                     seekTo(initialPositionMs)
                 }
