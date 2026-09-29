@@ -18,7 +18,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.FrameLayout
+import androidx.compose.foundation.focusable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -27,13 +27,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 
-class WebAppInterface(private val onStreamFound: (String) -> Unit) {
+class WebAppInterface(
+    private val onStreamFound: (String) -> Unit,
+    private val onRateLimit: () -> Unit = {},
+    private val onVideoTimeout: () -> Unit = {}
+) {
     @JavascriptInterface
     fun onVideoSourceFound(url: String) {
         val trimmed = url.trim()
         if (trimmed.isNotBlank() && (trimmed.contains(".m3u8") || (trimmed.contains(".mp4") && !trimmed.contains(".png")))) {
             onStreamFound(trimmed)
         }
+    }
+
+    @JavascriptInterface
+    fun onRateLimitDetected() {
+        onRateLimit()
+    }
+
+    @JavascriptInterface
+    fun onVideoTimeoutDetected() {
+        onVideoTimeout()
     }
 }
 
@@ -51,12 +65,15 @@ fun FallbackWebViewPlayer(
 
     val webView = remember(embedUrl) {
         WebView(context).apply {
-            layoutParams = FrameLayout.LayoutParams(
+            layoutParams = android.widget.FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             setBackgroundColor(android.graphics.Color.BLACK)
+            isFocusable = false
+            isFocusableInTouchMode = false
+            descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
 
             val cookieManager = CookieManager.getInstance()
             cookieManager.setAcceptCookie(true)
@@ -74,10 +91,30 @@ fun FallbackWebViewPlayer(
                 cacheMode = WebSettings.LOAD_DEFAULT
                 useWideViewPort = true
                 loadWithOverviewMode = true
-                userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
             }
 
-            addJavascriptInterface(WebAppInterface(onStreamFound), "AndroidBridge")
+            addJavascriptInterface(
+                WebAppInterface(
+                    onStreamFound = onStreamFound,
+                    onRateLimit = {
+                        post {
+                            stopLoading()
+                            loadUrl("about:blank")
+                            visibility = View.INVISIBLE
+                            onError("Máy chủ video đang giới hạn lưu lượng (Rate Limit: Mạng gửi quá nhiều yêu cầu). Vui lòng thử lại sau giây lát hoặc đổi sang mạng khác.")
+                        }
+                    },
+                    onVideoTimeout = {
+                        post {
+                            stopLoading()
+                            loadUrl("about:blank")
+                            visibility = View.INVISIBLE
+                            onError("Video tải lâu hơn dự kiến từ máy chủ nguồn. Bạn có thể tải lại trang hoặc quay lại chọn tập phim khác.")
+                        }
+                    }
+                ),
+                "AndroidBridge"
+            )
 
             webChromeClient = object : WebChromeClient() {
                 override fun getDefaultVideoPoster(): Bitmap {
@@ -111,13 +148,20 @@ fun FallbackWebViewPlayer(
 
                 override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
                     super.onReceivedError(view, request, error)
-                    if (request?.isForMainFrame == true && error?.errorCode == ERROR_HOST_LOOKUP) {
-                        onError("Không thể kết nối đến máy chủ phát video")
+                    if (request?.isForMainFrame == true) {
+                        view?.stopLoading()
+                        view?.loadUrl("about:blank")
+                        view?.visibility = View.INVISIBLE
+                        val description = error?.description?.toString() ?: "Lỗi kết nối"
+                        onError("Không thể kết nối đến máy chủ phát video ($description). Nguồn phát có thể bị chặn bởi tường lửa mạng hoặc gián đoạn.")
                     }
                 }
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
+                    if (url == null || url == "about:blank" || url.startsWith("chrome-error://")) {
+                        return
+                    }
 
                     // Inject stream interceptor, hide Android poster, and auto-click play
                     val js = """
@@ -163,44 +207,52 @@ fun FallbackWebViewPlayer(
                                 return origFetch.apply(this, arguments);
                             };
 
-                            // 3. Auto-play loop to click play buttons & unmute
+                            // 3. Auto-play loop to unmute and trigger HTML5 video playback
                             var attempts = 0;
                             var timer = setInterval(function() {
                                 attempts++;
-                                if (attempts > 15) clearInterval(timer);
+                                if (attempts > 12) clearInterval(timer);
 
                                 var videos = document.querySelectorAll('video');
                                 videos.forEach(function(v) {
-                                    v.muted = false;
-                                    v.play().catch(function() {
-                                        v.muted = true;
-                                        v.play().then(function() { v.muted = false; });
-                                    });
+                                    v.play().catch(function() {});
                                     if (v.src) notify(v.src);
                                 });
 
-                                var clickables = document.querySelectorAll('.jw-display-icon-container, .vjs-big-play-button, .play, .play-button, [class*="play"], [aria-label*="Play"], button');
+                                var clickables = document.querySelectorAll('.jw-display-icon-container, .vjs-big-play-button, .play-button');
                                 clickables.forEach(function(btn) {
                                     btn.click();
                                 });
 
-                                var center = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
-                                if (center) {
-                                    center.click();
+                                // Check for Cloudflare / CDN rate limit or verification blocks
+                                if (document.title && document.title.indexOf('Attention Required') !== -1) {
+                                    clearInterval(timer);
+                                    if (window.AndroidBridge && window.AndroidBridge.onRateLimitDetected) {
+                                        window.AndroidBridge.onRateLimitDetected();
+                                    }
                                 }
-                            }, 400);
+                                if (document.body && (document.body.innerText.indexOf('quá nhiều yêu cầu') !== -1 || document.body.innerText.indexOf('Web Page Blocked') !== -1)) {
+                                    clearInterval(timer);
+                                    if (window.AndroidBridge && window.AndroidBridge.onRateLimitDetected) {
+                                        window.AndroidBridge.onRateLimitDetected();
+                                    }
+                                }
+
+                                // Check for "tải lâu hơn" or "Tải lại trang" from stream embed
+                                if (document.body && (
+                                    document.body.innerText.indexOf('tải lâu hơn') !== -1 ||
+                                    document.body.innerText.indexOf('Tải lại trang') !== -1 ||
+                                    document.body.innerText.indexOf('đang tải lâu') !== -1
+                                )) {
+                                    clearInterval(timer);
+                                    if (window.AndroidBridge && window.AndroidBridge.onVideoTimeoutDetected) {
+                                        window.AndroidBridge.onVideoTimeoutDetected();
+                                    }
+                                }
+                            }, 500);
                         })();
                     """.trimIndent()
                     view?.evaluateJavascript(js, null)
-
-                    // 4. Simulate a real Android touch event at screen center after 1.2s
-                    view?.postDelayed({
-                        val w = view.width.toFloat().takeIf { it > 0f } ?: 1920f
-                        val h = view.height.toFloat().takeIf { it > 0f } ?: 1080f
-                        val now = SystemClock.uptimeMillis()
-                        view.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, w / 2f, h / 2f, 0))
-                        view.dispatchTouchEvent(MotionEvent.obtain(now, now + 50, MotionEvent.ACTION_UP, w / 2f, h / 2f, 0))
-                    }, 1200L)
                 }
             }
 
@@ -233,6 +285,6 @@ fun FallbackWebViewPlayer(
 
     AndroidView(
         factory = { webView },
-        modifier = modifier
+        modifier = modifier.focusable(false)
     )
 }

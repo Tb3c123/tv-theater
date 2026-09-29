@@ -3,6 +3,7 @@ package com.tvtheater.app.presentation.player
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.OptIn
+import androidx.compose.foundation.focusable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -104,12 +105,16 @@ fun NativePlayerView(
                 useController = false // We use our own customized 10-foot TV OSD
                 useArtwork = false
                 defaultArtwork = null
+                setShutterBackgroundColor(android.graphics.Color.BLACK)
+                isFocusable = false
+                isFocusableInTouchMode = false
+                descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
                 layoutParams = FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier.focusable(false)
     )
 }

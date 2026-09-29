@@ -44,6 +44,7 @@ class PlayerViewModel(
 
     private var lastSavedPositionMs = 0L
     private var osdHideJob: Job? = null
+    private var bufferingTimeoutJob: Job? = null
 
     fun initPlayer(
         movieSlug: String,
@@ -63,9 +64,21 @@ class PlayerViewModel(
             embedUrl = embedUrl,
             currentPositionMs = initialPositionMs,
             isPlaying = true,
-            isBuffering = true
+            isBuffering = true,
+            errorMessage = null
         )
         lastSavedPositionMs = initialPositionMs
+
+        bufferingTimeoutJob?.cancel()
+        bufferingTimeoutJob = viewModelScope.launch {
+            delay(18_000L)
+            if (_uiState.value.isBuffering || (_uiState.value.currentPositionMs == 0L && _uiState.value.errorMessage == null)) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = "Video tải lâu hơn dự kiến từ máy chủ nguồn. Bạn có thể tải lại trang hoặc quay lại chọn tập phim khác.",
+                    isBuffering = false
+                )
+            }
+        }
 
         viewModelScope.launch {
             val result = extractStreamUrlUseCase(embedUrl)
@@ -90,6 +103,7 @@ class PlayerViewModel(
     }
 
     fun onDirectStreamFound(url: String) {
+        bufferingTimeoutJob?.cancel()
         if (_uiState.value.streamUrl != url) {
             _uiState.value = _uiState.value.copy(
                 streamUrl = url,
@@ -106,10 +120,14 @@ class PlayerViewModel(
 
     fun setPlaying(playing: Boolean) {
         _uiState.value = _uiState.value.copy(isPlaying = playing)
+        if (playing) showOsdTemporarily()
     }
 
     fun setBuffering(buffering: Boolean) {
         _uiState.value = _uiState.value.copy(isBuffering = buffering)
+        if (!buffering && _uiState.value.isPlaying) {
+            showOsdTemporarily()
+        }
     }
 
     fun togglePlayerMode() {
@@ -123,6 +141,9 @@ class PlayerViewModel(
     }
 
     fun updateProgress(positionMs: Long, durationMs: Long) {
+        if (positionMs > 0L) {
+            bufferingTimeoutJob?.cancel()
+        }
         _uiState.value = _uiState.value.copy(
             currentPositionMs = positionMs,
             durationMs = durationMs
@@ -156,9 +177,14 @@ class PlayerViewModel(
     fun showOsdTemporarily(durationMs: Long = 4000L) {
         _uiState.value = _uiState.value.copy(isOsdVisible = true)
         osdHideJob?.cancel()
-        osdHideJob = viewModelScope.launch {
-            delay(durationMs)
-            _uiState.value = _uiState.value.copy(isOsdVisible = false)
+        // Only auto-hide if actively playing, not buffering, and no error
+        if (_uiState.value.isPlaying && !_uiState.value.isBuffering && _uiState.value.errorMessage == null) {
+            osdHideJob = viewModelScope.launch {
+                delay(durationMs)
+                if (_uiState.value.isPlaying && !_uiState.value.isBuffering && _uiState.value.errorMessage == null) {
+                    _uiState.value = _uiState.value.copy(isOsdVisible = false)
+                }
+            }
         }
     }
 
@@ -172,9 +198,24 @@ class PlayerViewModel(
     }
 
     fun onPlayerError(message: String) {
+        bufferingTimeoutJob?.cancel()
         _uiState.value = _uiState.value.copy(
             errorMessage = message,
+            isBuffering = false,
             playerMode = PlayerMode.WEBVIEW_FALLBACK
+        )
+    }
+
+    fun retry() {
+        val current = _uiState.value
+        initPlayer(
+            movieSlug = current.movieSlug,
+            movieName = current.movieName,
+            posterUrl = current.posterUrl,
+            episodeSlug = current.episodeSlug,
+            episodeName = current.episodeName,
+            embedUrl = current.embedUrl,
+            initialPositionMs = current.currentPositionMs
         )
     }
 }

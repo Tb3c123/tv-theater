@@ -34,7 +34,8 @@ fun PlayerScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val focusRequester = remember { FocusRequester() }
+    val backFocusRequester = remember { FocusRequester() }
+    val playPauseFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(embedUrl) {
         viewModel.initPlayer(
@@ -46,7 +47,6 @@ fun PlayerScreen(
             embedUrl = embedUrl,
             initialPositionMs = initialPositionMs
         )
-        focusRequester.requestFocus()
     }
 
     BackHandler {
@@ -57,25 +57,11 @@ fun PlayerScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
-            .focusRequester(focusRequester)
-            .focusable()
             .onPreviewKeyEvent { keyEvent ->
                 if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN) {
                     when (keyEvent.nativeKeyEvent.keyCode) {
-                        KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
-                            viewModel.togglePlayPause()
-                            true
-                        }
-                        KeyEvent.KEYCODE_DPAD_LEFT -> {
-                            val newPos = (uiState.currentPositionMs - 10_000L).coerceAtLeast(0L)
-                            viewModel.updateProgress(newPos, uiState.durationMs)
-                            viewModel.showOsdTemporarily()
-                            true
-                        }
-                        KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                            val newPos = (uiState.currentPositionMs + 10_000L).coerceAtMost(uiState.durationMs)
-                            viewModel.updateProgress(newPos, uiState.durationMs)
-                            viewModel.showOsdTemporarily()
+                        KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_ESCAPE -> {
+                            onBack()
                             true
                         }
                         KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
@@ -92,76 +78,113 @@ fun PlayerScreen(
                             viewModel.showOsdTemporarily()
                             true
                         }
-                        KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN -> {
-                            viewModel.toggleOsd()
-                            true
+                        KeyEvent.KEYCODE_DPAD_UP -> {
+                            if (uiState.errorMessage == null) {
+                                if (!uiState.isOsdVisible) {
+                                    viewModel.showOsdTemporarily()
+                                }
+                                try {
+                                    backFocusRequester.requestFocus()
+                                } catch (_: Exception) {}
+                                true
+                            } else false
+                        }
+                        KeyEvent.KEYCODE_DPAD_DOWN -> {
+                            if (uiState.errorMessage == null) {
+                                if (!uiState.isOsdVisible) {
+                                    viewModel.showOsdTemporarily()
+                                }
+                                try {
+                                    playPauseFocusRequester.requestFocus()
+                                } catch (_: Exception) {}
+                                true
+                            } else false
+                        }
+                        KeyEvent.KEYCODE_DPAD_LEFT,
+                        KeyEvent.KEYCODE_DPAD_RIGHT,
+                        KeyEvent.KEYCODE_DPAD_CENTER,
+                        KeyEvent.KEYCODE_ENTER -> {
+                            viewModel.showOsdTemporarily()
+                            false
                         }
                         else -> false
                     }
                 } else false
             }
     ) {
-        // Video View
-        if (uiState.playerMode == PlayerMode.NATIVE_EXOPLAYER && uiState.streamUrl != null) {
-            NativePlayerView(
-                streamUrl = uiState.streamUrl!!,
-                isPlaying = uiState.isPlaying,
-                initialPositionMs = uiState.currentPositionMs,
-                onProgressUpdate = { pos, dur ->
-                    viewModel.updateProgress(pos, dur)
-                },
-                onError = { error ->
-                    viewModel.onPlayerError(error)
-                },
-                modifier = Modifier.fillMaxSize()
+        if (uiState.errorMessage != null) {
+            PlayerErrorOverlay(
+                errorMessage = uiState.errorMessage!!,
+                movieName = uiState.movieName,
+                episodeName = uiState.episodeName,
+                onBack = onBack,
+                onRetry = { viewModel.retry() }
             )
-        } else if (uiState.embedUrl.isNotBlank()) {
-            FallbackWebViewPlayer(
-                embedUrl = uiState.embedUrl,
-                isPlaying = uiState.isPlaying,
-                onProgressUpdate = { pos, dur ->
-                    viewModel.updateProgress(pos, dur)
-                },
-                onStreamFound = { streamUrl ->
-                    viewModel.onDirectStreamFound(streamUrl)
-                },
-                onError = { error ->
-                    viewModel.onPlayerError(error)
-                },
-                modifier = Modifier.fillMaxSize()
-            )
-        }
-
-        // Buffering indicator
-        if (uiState.isBuffering) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = IceBluePrimary)
+        } else {
+            // Video View
+            if (uiState.playerMode == PlayerMode.NATIVE_EXOPLAYER && uiState.streamUrl != null) {
+                NativePlayerView(
+                    streamUrl = uiState.streamUrl!!,
+                    isPlaying = uiState.isPlaying,
+                    initialPositionMs = uiState.currentPositionMs,
+                    onProgressUpdate = { pos, dur ->
+                        viewModel.updateProgress(pos, dur)
+                    },
+                    onError = { error ->
+                        viewModel.onPlayerError(error)
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else if (uiState.embedUrl.isNotBlank()) {
+                FallbackWebViewPlayer(
+                    embedUrl = uiState.embedUrl,
+                    isPlaying = uiState.isPlaying,
+                    onProgressUpdate = { pos, dur ->
+                        viewModel.updateProgress(pos, dur)
+                    },
+                    onStreamFound = { streamUrl ->
+                        viewModel.onDirectStreamFound(streamUrl)
+                    },
+                    onError = { error ->
+                        viewModel.onPlayerError(error)
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
             }
-        }
 
-        // TV Remote OSD Overlay
-        PlayerOsdOverlay(
-            isVisible = uiState.isOsdVisible,
-            movieName = uiState.movieName,
-            episodeName = uiState.episodeName,
-            playerMode = uiState.playerMode,
-            isPlaying = uiState.isPlaying,
-            currentPositionMs = uiState.currentPositionMs,
-            durationMs = uiState.durationMs,
-            onPlayPauseClick = { viewModel.togglePlayPause() },
-            onRewindClick = {
-                val newPos = (uiState.currentPositionMs - 10_000L).coerceAtLeast(0L)
-                viewModel.updateProgress(newPos, uiState.durationMs)
-            },
-            onForwardClick = {
-                val newPos = (uiState.currentPositionMs + 10_000L).coerceAtMost(uiState.durationMs)
-                viewModel.updateProgress(newPos, uiState.durationMs)
-            },
-            onTogglePlayerMode = { viewModel.togglePlayerMode() },
-            onBack = onBack
-        )
+            // Buffering indicator
+            if (uiState.isBuffering) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = IceBluePrimary)
+                }
+            }
+
+            // TV Remote OSD Overlay
+            PlayerOsdOverlay(
+                isVisible = uiState.isOsdVisible,
+                movieName = uiState.movieName,
+                episodeName = uiState.episodeName,
+                playerMode = uiState.playerMode,
+                isPlaying = uiState.isPlaying,
+                currentPositionMs = uiState.currentPositionMs,
+                durationMs = uiState.durationMs,
+                onPlayPauseClick = { viewModel.togglePlayPause() },
+                onRewindClick = {
+                    val newPos = (uiState.currentPositionMs - 10_000L).coerceAtLeast(0L)
+                    viewModel.updateProgress(newPos, uiState.durationMs)
+                },
+                onForwardClick = {
+                    val newPos = (uiState.currentPositionMs + 10_000L).coerceAtMost(uiState.durationMs)
+                    viewModel.updateProgress(newPos, uiState.durationMs)
+                },
+                onTogglePlayerMode = { viewModel.togglePlayerMode() },
+                onBack = onBack,
+                backFocusRequester = backFocusRequester,
+                playPauseFocusRequester = playPauseFocusRequester
+            )
+        }
     }
 }

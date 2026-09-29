@@ -18,8 +18,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.style.TextAlign
+import kotlinx.coroutines.delay
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -53,8 +60,21 @@ fun PlayerOsdOverlay(
     onForwardClick: () -> Unit,
     onTogglePlayerMode: () -> Unit,
     onBack: () -> Unit,
+    backFocusRequester: FocusRequester = remember { FocusRequester() },
+    playPauseFocusRequester: FocusRequester = remember { FocusRequester() },
     modifier: Modifier = Modifier
 ) {
+    val modeFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            delay(100)
+            try {
+                playPauseFocusRequester.requestFocus()
+            } catch (_: Exception) {}
+        }
+    }
+
     AnimatedVisibility(
         visible = isVisible,
         enter = fadeIn(),
@@ -90,6 +110,13 @@ fun PlayerOsdOverlay(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Button(
                         onClick = onBack,
+                        modifier = Modifier
+                            .focusRequester(backFocusRequester)
+                            .focusProperties {
+                                down = playPauseFocusRequester
+                                right = modeFocusRequester
+                            },
+                        scale = ButtonDefaults.scale(focusedScale = 1.15f),
                         colors = ButtonDefaults.colors(
                             containerColor = DarkNavySurface.copy(alpha = 0.8f),
                             contentColor = TextSoftWhite,
@@ -121,6 +148,13 @@ fun PlayerOsdOverlay(
                 // Mode Indicator Badge Button
                 Button(
                     onClick = onTogglePlayerMode,
+                    modifier = Modifier
+                        .focusRequester(modeFocusRequester)
+                        .focusProperties {
+                            down = playPauseFocusRequester
+                            left = backFocusRequester
+                        },
+                    scale = ButtonDefaults.scale(focusedScale = 1.08f),
                     colors = ButtonDefaults.colors(
                         containerColor = DarkNavySurface.copy(alpha = 0.8f),
                         contentColor = IceBluePrimary,
@@ -209,6 +243,9 @@ fun PlayerOsdOverlay(
                     // Rewind 10s
                     Button(
                         onClick = onRewindClick,
+                        modifier = Modifier.focusProperties {
+                            up = backFocusRequester
+                        },
                         scale = ButtonDefaults.scale(focusedScale = 1.1f),
                         colors = ButtonDefaults.colors(
                             containerColor = DarkNavySurface,
@@ -226,6 +263,11 @@ fun PlayerOsdOverlay(
                     // Play/Pause
                     Button(
                         onClick = onPlayPauseClick,
+                        modifier = Modifier
+                            .focusRequester(playPauseFocusRequester)
+                            .focusProperties {
+                                up = backFocusRequester
+                            },
                         scale = ButtonDefaults.scale(focusedScale = 1.15f),
                         colors = ButtonDefaults.colors(
                             containerColor = IceBluePrimary,
@@ -247,6 +289,9 @@ fun PlayerOsdOverlay(
                     // Forward 10s
                     Button(
                         onClick = onForwardClick,
+                        modifier = Modifier.focusProperties {
+                            up = backFocusRequester
+                        },
                         scale = ButtonDefaults.scale(focusedScale = 1.1f),
                         colors = ButtonDefaults.colors(
                             containerColor = DarkNavySurface,
@@ -275,3 +320,125 @@ private fun formatTime(millis: Long): String {
         String.format("%02d:%02d", minutes, seconds)
     }
 }
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+fun PlayerErrorOverlay(
+    errorMessage: String,
+    movieName: String,
+    episodeName: String,
+    onBack: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val retryFocusRequester = remember { FocusRequester() }
+    val backFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        delay(100)
+        try {
+            retryFocusRequester.requestFocus()
+        } catch (_: Exception) {}
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(DeepNavyBackground)
+            .padding(48.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth(0.7f)
+        ) {
+            Text(
+                text = "⚠️",
+                fontSize = 48.sp
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Không thể phát video",
+                color = TextSoftWhite,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "$movieName • $episodeName",
+                color = SkyBlueSecondary,
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = errorMessage,
+                color = TextMutedGray,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    onClick = onRetry,
+                    modifier = Modifier
+                        .focusRequester(retryFocusRequester)
+                        .focusProperties {
+                            right = backFocusRequester
+                        },
+                    scale = ButtonDefaults.scale(focusedScale = 1.15f),
+                    colors = ButtonDefaults.colors(
+                        containerColor = IceBluePrimary,
+                        contentColor = DeepNavyBackground,
+                        focusedContainerColor = Color.White,
+                        focusedContentColor = DeepNavyBackground
+                    ),
+                    shape = ButtonDefaults.shape(RoundedCornerShape(8.dp))
+                ) {
+                    Text(
+                        text = "🔄 Tải lại trang (Thử lại)",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                    )
+                }
+
+                Button(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .focusRequester(backFocusRequester)
+                        .focusProperties {
+                            left = retryFocusRequester
+                        },
+                    scale = ButtonDefaults.scale(focusedScale = 1.12f),
+                    colors = ButtonDefaults.colors(
+                        containerColor = DarkNavySurface,
+                        contentColor = TextSoftWhite,
+                        focusedContainerColor = SkyBlueSecondary,
+                        focusedContentColor = DeepNavyBackground
+                    ),
+                    shape = ButtonDefaults.shape(RoundedCornerShape(8.dp))
+                ) {
+                    Text(
+                        text = "← Quay lại danh sách phim",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
