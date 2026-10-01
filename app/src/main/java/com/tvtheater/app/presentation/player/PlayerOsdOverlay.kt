@@ -58,22 +58,17 @@ fun PlayerOsdOverlay(
     onPlayPauseClick: () -> Unit,
     onRewindClick: () -> Unit,
     onForwardClick: () -> Unit,
+    onReplayClick: () -> Unit = {},
     onTogglePlayerMode: () -> Unit,
     onBack: () -> Unit,
     backFocusRequester: FocusRequester = remember { FocusRequester() },
     playPauseFocusRequester: FocusRequester = remember { FocusRequester() },
+    rewindFocusRequester: FocusRequester = remember { FocusRequester() },
+    forwardFocusRequester: FocusRequester = remember { FocusRequester() },
+    replayFocusRequester: FocusRequester = remember { FocusRequester() },
     modifier: Modifier = Modifier
 ) {
     val modeFocusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(isVisible) {
-        if (isVisible) {
-            delay(100)
-            try {
-                playPauseFocusRequester.requestFocus()
-            } catch (_: Exception) {}
-        }
-    }
 
     AnimatedVisibility(
         visible = isVisible,
@@ -237,67 +232,134 @@ fun PlayerOsdOverlay(
                 // Control Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Rewind 10s
+                    // Button 1: Replay from 00:00
                     Button(
-                        onClick = onRewindClick,
-                        modifier = Modifier.focusProperties {
-                            up = backFocusRequester
-                        },
-                        scale = ButtonDefaults.scale(focusedScale = 1.1f),
+                        onClick = onReplayClick,
+                        modifier = Modifier
+                            .focusRequester(replayFocusRequester)
+                            .focusProperties {
+                                up = backFocusRequester
+                                right = rewindFocusRequester
+                            },
+                        scale = ButtonDefaults.scale(scale = 1.0f, focusedScale = 1.10f),
                         colors = ButtonDefaults.colors(
                             containerColor = DarkNavySurface,
                             contentColor = TextSoftWhite,
                             focusedContainerColor = IceBluePrimary,
                             focusedContentColor = DeepNavyBackground
+                        ),
+                        border = ButtonDefaults.border(
+                            border = Border(
+                                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                            focusedBorder = Border(
+                                border = BorderStroke(3.dp, Color.White),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                        ),
+                        shape = ButtonDefaults.shape(RoundedCornerShape(8.dp))
+                    ) {
+                        Text(text = "⏮ Xem lại (00:00)", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    }
+
+                    // Button 2: Rewind 10s
+                    Button(
+                        onClick = onRewindClick,
+                        modifier = Modifier
+                            .focusRequester(rewindFocusRequester)
+                            .focusProperties {
+                                up = backFocusRequester
+                                left = replayFocusRequester
+                                right = playPauseFocusRequester
+                            },
+                        scale = ButtonDefaults.scale(scale = 1.0f, focusedScale = 1.10f),
+                        colors = ButtonDefaults.colors(
+                            containerColor = DarkNavySurface,
+                            contentColor = TextSoftWhite,
+                            focusedContainerColor = IceBluePrimary,
+                            focusedContentColor = DeepNavyBackground
+                        ),
+                        border = ButtonDefaults.border(
+                            border = Border(
+                                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                            focusedBorder = Border(
+                                border = BorderStroke(3.dp, Color.White),
+                                shape = RoundedCornerShape(8.dp)
+                            )
                         ),
                         shape = ButtonDefaults.shape(RoundedCornerShape(8.dp))
                     ) {
                         Text(text = "⏪ -10s", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
 
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    // Play/Pause
+                    // Button 3: Play/Pause
                     Button(
                         onClick = onPlayPauseClick,
                         modifier = Modifier
                             .focusRequester(playPauseFocusRequester)
                             .focusProperties {
                                 up = backFocusRequester
+                                left = rewindFocusRequester
+                                right = forwardFocusRequester
                             },
-                        scale = ButtonDefaults.scale(focusedScale = 1.15f),
-                        colors = ButtonDefaults.colors(
-                            containerColor = IceBluePrimary,
-                            contentColor = DeepNavyBackground,
-                            focusedContainerColor = SkyBlueSecondary,
-                            focusedContentColor = DeepNavyBackground
-                        ),
-                        shape = ButtonDefaults.shape(RoundedCornerShape(8.dp))
-                    ) {
-                        Text(
-                            text = if (isPlaying) "⏸ Tạm Dừng" else "▶ Tiếp Tục",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    // Forward 10s
-                    Button(
-                        onClick = onForwardClick,
-                        modifier = Modifier.focusProperties {
-                            up = backFocusRequester
-                        },
-                        scale = ButtonDefaults.scale(focusedScale = 1.1f),
+                        scale = ButtonDefaults.scale(scale = 1.0f, focusedScale = 1.10f),
                         colors = ButtonDefaults.colors(
                             containerColor = DarkNavySurface,
                             contentColor = TextSoftWhite,
                             focusedContainerColor = IceBluePrimary,
                             focusedContentColor = DeepNavyBackground
+                        ),
+                        border = ButtonDefaults.border(
+                            border = Border(
+                                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                            focusedBorder = Border(
+                                border = BorderStroke(3.dp, Color.White),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                        ),
+                        shape = ButtonDefaults.shape(RoundedCornerShape(8.dp))
+                    ) {
+                        Text(
+                            text = if (isPlaying) "⏸ Tạm Dừng" else "▶ Tiếp Tục",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                        )
+                    }
+
+                    // Button 4: Forward 10s
+                    Button(
+                        onClick = onForwardClick,
+                        modifier = Modifier
+                            .focusRequester(forwardFocusRequester)
+                            .focusProperties {
+                                up = backFocusRequester
+                                left = playPauseFocusRequester
+                            },
+                        scale = ButtonDefaults.scale(scale = 1.0f, focusedScale = 1.10f),
+                        colors = ButtonDefaults.colors(
+                            containerColor = DarkNavySurface,
+                            contentColor = TextSoftWhite,
+                            focusedContainerColor = IceBluePrimary,
+                            focusedContentColor = DeepNavyBackground
+                        ),
+                        border = ButtonDefaults.border(
+                            border = Border(
+                                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                            focusedBorder = Border(
+                                border = BorderStroke(3.dp, Color.White),
+                                shape = RoundedCornerShape(8.dp)
+                            )
                         ),
                         shape = ButtonDefaults.shape(RoundedCornerShape(8.dp))
                     ) {

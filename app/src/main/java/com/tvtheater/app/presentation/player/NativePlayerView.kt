@@ -29,6 +29,8 @@ fun NativePlayerView(
     streamUrl: String,
     isPlaying: Boolean,
     initialPositionMs: Long,
+    seekTrigger: Int = 0,
+    seekTargetMs: Long? = null,
     onProgressUpdate: (positionMs: Long, durationMs: Long) -> Unit,
     onError: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -81,8 +83,17 @@ fun NativePlayerView(
 
     // Sync play/pause state
     LaunchedEffect(isPlaying) {
-        if (exoPlayer.playWhenReady != isPlaying) {
-            exoPlayer.playWhenReady = isPlaying
+        if (isPlaying) {
+            exoPlayer.play()
+        } else {
+            exoPlayer.pause()
+        }
+    }
+
+    // Handle seek commands
+    LaunchedEffect(seekTrigger) {
+        if (seekTrigger > 0 && seekTargetMs != null) {
+            exoPlayer.seekTo(seekTargetMs)
         }
     }
 
