@@ -3,6 +3,7 @@ package com.tvtheater.app.presentation.player
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.http.SslError
+import android.os.Build
 import android.os.SystemClock
 import android.view.MotionEvent
 import android.view.View
@@ -216,7 +217,11 @@ fun FallbackWebViewPlayer(
                         view?.stopLoading()
                         view?.loadUrl("about:blank")
                         view?.visibility = View.INVISIBLE
-                        val description = error?.description?.toString() ?: "Lỗi kết nối"
+                        val description = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            error?.description?.toString() ?: "Lỗi kết nối"
+                        } else {
+                            "Lỗi kết nối"
+                        }
                         onError("Không thể kết nối đến máy chủ phát video ($description). Nguồn phát có thể bị chặn bởi tường lửa mạng hoặc gián đoạn.")
                     }
                 }
